@@ -1,0 +1,79 @@
+{
+  "project": "Windows Server Failover Cluster POC - HR Workload",
+  "domain": "corp.hr.local",
+  "netbios": "CORP",
+  "hyperv_host": {
+    "hostname": "DESKTOP-NVBB8P4",
+    "switch_name": "LabInternalSwitch",
+    "host_ip": "192.168.77.1"
+  },
+  "virtual_machines": [
+    {
+      "name": "DC01",
+      "role": "Domain Controller / DNS",
+      "ip": "192.168.77.10",
+      "memory_mb": 1980
+    },
+    {
+      "name": "STORAGE01",
+      "ad_computer": "WIN-SCPVGL8HT6C",
+      "role": "iSCSI Target Server",
+      "ip": "192.168.77.20",
+      "memory_mb": 1628
+    },
+    {
+      "name": "HV-NODE1",
+      "role": "Cluster Node 1",
+      "ip": "192.168.77.31",
+      "memory_mb": 2126,
+      "cluster_node_id": 1
+    },
+    {
+      "name": "HV-NODE2",
+      "role": "Cluster Node 2",
+      "ip": "192.168.77.32",
+      "memory_mb": 1930,
+      "cluster_node_id": 2
+    }
+  ],
+  "shared_storage": [
+    {
+      "name": "Quorum Disk",
+      "path": "F:\\iSCSIVirtualDisks\\Quorum.vhdx",
+      "size_bytes": 9663676416,
+      "serial_number": "251E9A3E-F2C0-4F65-AC42-C82132F88859",
+      "purpose": "NodeAndDiskMajority Quorum Witness"
+    },
+    {
+      "name": "HR Data Disk",
+      "path": "E:\\iSCSIVirtualDisks\\HRData.vhdx",
+      "size_bytes": 51539607552,
+      "serial_number": "308ACB9C-75E7-4C79-BE71-2ACAD5F56609",
+      "drive_letter": "E:",
+      "purpose": "HRAppRole Clustered Storage"
+    }
+  ],
+  "cluster": {
+    "name": "HRCluster",
+    "vip": "192.168.77.50",
+    "quorum_type": "Majority",
+    "quorum_resource": "Quorum Disk",
+    "roles": [
+      {
+        "name": "HRAppRole",
+        "vip": "192.168.77.51",
+        "smb_share": {
+          "name": "HRDocs$",
+          "unc_path": "\\\\HRAPPROLE\\HRDocs$",
+          "local_path": "E:\\HRDocs",
+          "continuously_available": true
+        }
+      }
+    ],
+    "optional_nlb": {
+      "name": "HRWebLB.corp.hr.local",
+      "vip": "192.168.77.60",
+      "operation_mode": "Unicast"
+    }
+  }
+}
